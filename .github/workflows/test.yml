@@ -31,8 +31,7 @@ jobs:
 
     - name: Run unit tests
       run: |
-        cd solution
-        python -m pytest tests/ -v --cov=. --cov-report=xml
+        python -m pytest solution/tests/ -v --cov=solution --cov-report=xml
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
