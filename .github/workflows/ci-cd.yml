@@ -84,6 +84,6 @@ jobs:
       with:
         context: .
         file: solution/Dockerfile
-        push: true
+        push: True
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
