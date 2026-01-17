@@ -70,7 +70,6 @@ jobs:
 
     - name: Run unit tests
       run: |
-        cd solution
         python -m pytest solution/tests/ -v --cov=solution --cov-report=xml
 
   test-integration:
