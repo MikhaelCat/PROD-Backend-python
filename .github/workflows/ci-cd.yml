@@ -32,8 +32,7 @@ jobs:
 
     - name: Run tests
       run: |
-        cd solution
-        python -m pytest tests/ -v --cov=.
+        python -m pytest solution/tests/ -v --cov=solution --cov-report=xml
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
