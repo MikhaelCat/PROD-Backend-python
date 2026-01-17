@@ -11,4 +11,5 @@ alembic==1.13.1
 redis==5.0.1
 uuid==1.30
 typing-extensions==4.8.0
+httpx
 psycopg2-binary==2.9.9
