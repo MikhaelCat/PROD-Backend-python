@@ -1,6 +1,20 @@
 ```
-# CI/CD workflows (if needed in root)
-!.github/
+# Documentation
+docs/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
 
 # Dependencies
 node_modules/
@@ -13,36 +27,12 @@ dist/
 build/
 target/
 .gradle/
-.julia/
-zig*/
 
-# Compiled files
-*.pyc
-*.class
-*.o
-*.exe
-*.dll
-*.so
-*.a
-*.obj
-*.out
-
-# Editor/IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# System files
+# OS generated files
 .DS_Store
 Thumbs.db
-.env
-.env.local
-*.env.*
 
-# Logs and coverage
-*.log
+# Coverage reports
 coverage/
 htmlcov/
 .coverage
