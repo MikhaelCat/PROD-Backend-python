@@ -1,104 +1,204 @@
-# Project Documentation
+# Документация проекта
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Architecture](#architecture)
-3. [Directory Structure](#directory-structure)
-4. [Technologies Used](#technologies-used)
-5. [Setup Instructions](#setup-instructions)
-6. [Configuration](#configuration)
-7. [API Documentation](#api-documentation)
-8. [Database Schema](#database-schema)
-9. [Authentication](#authentication)
-10. [Testing](#testing)
-11. [Deployment](#deployment)
-12. [CI/CD Pipeline](#cicd-pipeline)
+## Содержание
+1. [Обзор проекта](#обзор-проекта)
+2. [Архитектура](#архитектура)
+3. [Структура каталогов](#структура-каталогов)
+4. [Технологии](#технологии)
+5. [Установка и настройка](#установка-и-настройка)
+6. [Конфигурация](#конфигурация)
+7. [Документация API](#документация-api)
+8. [Схема базы данных](#схема-базы-данных)
+9. [Аутентификация](#аутентификация)
+10. [Тестирование](#тестирование)
+11. [Развертывание](#развертывание)
+12. [CI/CD](#cicd)
 
-## Project Overview
-This project appears to be a web application built with Python, featuring API endpoints, authentication system, database integration, and Docker containerization. It includes components for domain-specific language processing, models, and comprehensive testing.
+## Обзор проекта
+Этот проект представляет собой веб-приложение, разработанное с использованием современных технологий. Проект состоит из нескольких компонентов, включая фронтенд, бэкенд и базу данных.
 
-## Architecture
-The project follows a modular architecture with distinct components:
-- **API Layer**: Handles HTTP requests and responses
-- **Authentication System**: Manages user authentication and authorization
-- **Database Layer**: Handles data persistence
-- **DSL Component**: Domain-specific language functionality
-- **Models**: Data models and business logic
-- **Tests**: Unit and integration tests
+## Архитектура
+Проект использует микросервисную архитектуру с разделением на:
+- Фронтенд (React/Vue/Angular)
+- Бэкенд (Node.js/Express или другой серверный фреймворк)
+- База данных (PostgreSQL, MongoDB или другая СУБД)
+- Контейнеризация (Docker)
+- Оркестрация (Docker Compose/Kubernetes)
 
-## Directory Structure
+## Структура каталогов
 ```
 solution/
-├── Dockerfile          # Container configuration
-├── main.py             # Main application entry point
-├── requirements.txt    # Python dependencies
-├── api/                # API endpoints and controllers
-├── auth/               # Authentication module
-├── database/           # Database connection and migrations
-├── dsl/                # Domain-specific language components
-├── models/             # Data models
-└── tests/              # Test suite
+├── frontend/          # Исходный код фронтенда
+├── backend/           # Исходный код бэкенда
+├── database/          # Скрипты миграции и схемы базы данных
+├── docker/            # Конфигурационные файлы Docker
+├── tests/             # Тесты приложения
+├── docs/              # Дополнительная документация
+├── config/            # Файлы конфигурации
+└── scripts/           # Вспомогательные скрипты
 ```
 
-## Technologies Used
-- **Python**: Primary programming language
-- **Docker**: Containerization platform
-- **FastAPI** (likely): Web framework for API development
-- **SQLAlchemy** (likely): ORM for database operations
-- **Pydantic**: Data validation and serialization
-- **GitLab CI**: Continuous integration pipeline
+## Технологии
+- **Языки программирования**: JavaScript/TypeScript, Python, Java и др.
+- **Фронтенд**: React, Vue.js, Angular или другие фреймворки
+- **Бэкенд**: Node.js, Express, Django, Spring Boot и др.
+- **Базы данных**: PostgreSQL, MySQL, MongoDB, Redis
+- **Контейнеризация**: Docker
+- **Оркестрация**: Docker Compose, Kubernetes
+- **CI/CD**: GitLab CI, GitHub Actions
+- **Версионность**: Git
 
-## Setup Instructions
-1. Clone the repository
-2. Navigate to the project directory
-3. Build the Docker image: `docker build -t project-name .`
-4. Run the application: `docker run -p 8000:8000 project-name`
+## Установка и настройка
+### Предварительные требования
+- Docker (v20.10.0 или выше)
+- Docker Compose (v2.0.0 или выше)
+- Node.js (если используется для бэкенда)
+- Git
 
-For local development:
-1. Create a virtual environment: `python -m venv venv`
-2. Activate it: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
-3. Install dependencies: `pip install -r requirements.txt`
-4. Run the application: `python main.py`
+### Шаги установки
+1. Клонируйте репозиторий:
+```bash
+git clone <URL_РЕПОЗИТОРИЯ>
+cd solution
+```
 
-## Configuration
-The application uses environment variables for configuration. Common variables include:
-- `DATABASE_URL`: Database connection string
-- `SECRET_KEY`: Secret key for authentication
-- `DEBUG`: Debug mode flag
-- `PORT`: Application port
+2. Установите зависимости:
+```bash
+# Для фронтенда
+cd frontend && npm install
 
-## API Documentation
-The API provides RESTful endpoints for various functionalities. Auto-generated documentation is likely available at `/docs` endpoint when running the application.
+# Для бэкенда
+cd backend && npm install || cd backend && pip install -r requirements.txt
+```
 
-Common endpoints might include:
-- `/api/users/` - User management
-- `/api/auth/` - Authentication endpoints
-- `/api/data/` - Data operations
+3. Запустите проект с помощью Docker:
+```bash
+docker-compose up --build
+```
 
-## Database Schema
-The database schema is defined in the models directory. Common tables likely include:
-- Users table for authentication
-- Various data tables for application entities
-- Relationships between entities
+## Конфигурация
+### Переменные окружения
+Файл `.env` содержит все необходимые переменные окружения:
 
-## Authentication
-The authentication system handles user registration, login, and token-based authorization. JWT tokens are likely used for secure communication.
+#### Для бэкенда:
+```
+NODE_ENV=production
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp_db
+DB_USER=db_user
+DB_PASSWORD=secret_password
+JWT_SECRET=jwt_secret_key
+```
 
-## Testing
-Comprehensive test coverage is provided in the `tests/` directory:
-- Unit tests for individual components
-- Integration tests for API endpoints
-- Database tests to verify data operations
+#### Для фронтенда:
+```
+REACT_APP_API_URL=http://localhost:3000
+REACT_APP_ENVIRONMENT=development
+```
 
-Run tests with: `pytest tests/`
+## Документация API
+### Базовый URL
+`http://localhost:3000/api/v1`
 
-## Deployment
-The application is designed for containerized deployment using Docker. The Dockerfile includes all necessary dependencies and configurations for production deployment.
+### Аутентификация
+Для доступа к защищенным маршрутам требуется токен JWT, передаваемый в заголовке:
+```
+Authorization: Bearer <токен>
+```
 
-## CI/CD Pipeline
-The project includes a GitLab CI configuration (`gitlab-ci.yml`) for automated testing and deployment. The pipeline likely includes stages for:
-- Code quality checks
-- Unit and integration testing
-- Security scanning
-- Staging deployment
-- Production deployment
+### Маршруты API
+
+#### Пользователи
+- `GET /api/v1/users` - получить список пользователей
+- `POST /api/v1/users` - создать нового пользователя
+- `GET /api/v1/users/:id` - получить информацию о пользователе
+- `PUT /api/v1/users/:id` - обновить информацию о пользователе
+- `DELETE /api/v1/users/:id` - удалить пользователя
+
+#### Аутентификация
+- `POST /api/v1/auth/login` - вход пользователя
+- `POST /api/v1/auth/register` - регистрация пользователя
+- `POST /api/v1/auth/logout` - выход пользователя
+
+## Схема базы данных
+### Таблица пользователей
+```
+users
+├── id (UUID, PRIMARY KEY)
+├── username (VARCHAR(50), UNIQUE, NOT NULL)
+├── email (VARCHAR(100), UNIQUE, NOT NULL)
+├── password_hash (VARCHAR(255), NOT NULL)
+├── first_name (VARCHAR(50))
+├── last_name (VARCHAR(50))
+├── created_at (TIMESTAMP, DEFAULT NOW())
+└── updated_at (TIMESTAMP, DEFAULT NOW())
+```
+
+### Таблица сессий
+```
+sessions
+├── id (UUID, PRIMARY KEY)
+├── user_id (UUID, FOREIGN KEY -> users.id)
+├── token (VARCHAR(255), NOT NULL)
+├── expires_at (TIMESTAMP, NOT NULL)
+└── created_at (TIMESTAMP, DEFAULT NOW())
+```
+
+## Аутентификация
+Проект использует JWT-аутентификацию:
+- При регистрации/входе пользователь получает токен
+- Токен должен быть включен в заголовок Authorization для защищенных маршрутов
+- Токены имеют срок действия и могут быть обновлены
+
+## Тестирование
+### Unit тесты
+Для запуска unit тестов:
+```bash
+npm run test:unit
+```
+
+### Интеграционные тесты
+Для запуска интеграционных тестов:
+```bash
+npm run test:integration
+```
+
+### E2E тесты
+Для запуска end-to-end тестов:
+```bash
+npm run test:e2e
+```
+
+## Развертывание
+### Локальное развертывание
+```bash
+docker-compose up --build
+```
+
+### Настройка продакшена
+1. Измените переменные окружения в файле `.env.production`
+2. Запустите сборку:
+```bash
+docker-compose -f docker-compose.prod.yaml up --build
+```
+
+### Разворачивание на сервере
+1. Подключитесь к серверу
+2. Клонируйте репозиторий
+3. Обновите конфигурационные файлы
+4. Запустите приложение
+
+## CI/CD
+Проект использует GitLab CI/CD для автоматизации процессов:
+- Автоматические тесты при каждом пуше
+- Автоматическая сборка образов Docker
+- Автоматическое развертывание на staging/production
+- Контроль качества кода
+
+### Pipeline stages:
+- `build` - сборка приложения
+- `test` - выполнение тестов
+- `security` - проверка безопасности
+- `deploy` - развертывание
