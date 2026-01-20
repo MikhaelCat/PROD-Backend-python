@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 
-from solution.main import app
-from solution.database.connection import Base
+from main import app
+from database.connection import Base
 
 
 @pytest.fixture(scope="module")
@@ -35,7 +35,7 @@ def mock_db_session():
         finally:
             db.close()
     
-    from solution.database import connection
+    from database import connection
     connection.get_db = override_get_db
     
     yield TestingSessionLocal()
@@ -46,5 +46,5 @@ def mock_db_session():
 @pytest.fixture
 def mock_auth_dependencies():
     """Mock authentication dependencies for testing"""
-    with patch("solution.auth.dependencies.get_current_user") as mock_get_current_user:
+    with patch("auth.dependencies.get_current_user") as mock_get_current_user:
         yield mock_get_current_user

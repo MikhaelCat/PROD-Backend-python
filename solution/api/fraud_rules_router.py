@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import Field, BaseModel
 
-from solution.database.connection import get_db
-from solution.auth.dependencies import get_current_admin_user
-from solution.models.fraud_rule import FraudRule
-from solution.dsl.validator import validate_dsl_expression, DslValidateResponse
+from database.connection import get_db
+from auth.dependencies import get_current_admin_user
+from models.fraud_rule import FraudRule
+from dsl.validator import validate_dsl_expression, DslValidateResponse
 
 router = APIRouter(prefix="/fraud-rules", tags=["fraud_rules"])
 

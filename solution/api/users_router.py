@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import Field, BaseModel
 
-from solution.database.connection import get_db
-from solution.auth.dependencies import get_current_user, get_current_admin_user
-from solution.models.user import User
-from solution.auth.utils import get_password_hash
+from database.connection import get_db
+from auth.dependencies import get_current_user, get_current_admin_user
+from models.user import User
+from auth.utils import get_password_hash
 
 router = APIRouter(prefix="/users", tags=["users"])
 

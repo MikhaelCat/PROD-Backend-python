@@ -5,10 +5,10 @@ from typing import Optional
 from pydantic import Field, validator
 from pydantic.main import BaseModel
 
-from solution.database.connection import get_db
-from solution.auth.utils import verify_password, get_password_hash, create_access_token
-from solution.models.user import User
-from solution.database.settings import settings
+from database.connection import get_db
+from auth.utils import verify_password, get_password_hash, create_access_token
+from models.user import User
+from database.settings import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

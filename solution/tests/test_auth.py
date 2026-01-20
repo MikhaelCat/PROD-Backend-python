@@ -7,8 +7,8 @@ from unittest.mock import patch
 def test_register_endpoint(client, mock_db_session):
     """Test the user registration endpoint"""
     # Mock the password hashing and token creation
-    with patch('solution.auth.utils.get_password_hash') as mock_hash, \
-         patch('solution.auth.utils.create_access_token') as mock_token:
+    with patch('auth.utils.get_password_hash') as mock_hash, \
+         patch('auth.utils.create_access_token') as mock_token:
         
         mock_hash.return_value = "hashed_password"
         mock_token.return_value = "mocked_token"
@@ -39,8 +39,8 @@ def test_register_endpoint(client, mock_db_session):
 
 def test_register_duplicate_email(client, mock_db_session):
     """Test registration with duplicate email"""
-    with patch('solution.auth.utils.get_password_hash') as mock_hash, \
-         patch('solution.auth.utils.create_access_token') as mock_token:
+    with patch('auth.utils.get_password_hash') as mock_hash, \
+         patch('auth.utils.create_access_token') as mock_token:
         
         mock_hash.return_value = "hashed_password"
         mock_token.return_value = "mocked_token"
@@ -63,8 +63,8 @@ def test_register_duplicate_email(client, mock_db_session):
 def test_login_success(client, mock_db_session):
     """Test successful login"""
     # Mock user lookup and authentication
-    with patch('solution.auth.utils.verify_password') as mock_verify, \
-         patch('solution.auth.utils.create_access_token') as mock_token:
+    with patch('auth.utils.verify_password') as mock_verify, \
+         patch('auth.utils.create_access_token') as mock_token:
         
         mock_verify.return_value = True
         mock_token.return_value = "mocked_token"
@@ -97,7 +97,7 @@ def test_login_success(client, mock_db_session):
 
 def test_login_invalid_credentials(client, mock_db_session):
     """Test login with invalid credentials"""
-    with patch('solution.auth.utils.verify_password') as mock_verify:
+    with patch('auth.utils.verify_password') as mock_verify:
         mock_verify.return_value = False  # Password doesn't match
         
         login_data = {
@@ -112,8 +112,8 @@ def test_login_invalid_credentials(client, mock_db_session):
 
 def test_login_inactive_user(client, mock_db_session):
     """Test login attempt by inactive user"""
-    with patch('solution.auth.utils.verify_password') as mock_verify, \
-         patch('solution.auth.utils.create_access_token') as mock_token:
+    with patch('auth.utils.verify_password') as mock_verify, \
+         patch('auth.utils.create_access_token') as mock_token:
         
         mock_verify.return_value = True  # Password matches
         mock_token.return_value = "mocked_token"

@@ -161,7 +161,7 @@ def test_fraud_check_on_transaction(client, mock_auth_dependencies):
     }
     
     # Mock fraud rule checking
-    with patch('solution.dsl.validator.apply_fraud_rules') as mock_fraud_check:
+    with patch('dsl.validator.apply_fraud_rules') as mock_fraud_check:
         mock_fraud_check.return_value = {
             "is_fraud": True,
             "score": 0.95,

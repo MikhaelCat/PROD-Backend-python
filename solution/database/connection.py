@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from solution.database.settings import settings
+from database.settings import settings
 
 # cоздание базового класса для моделей
 Base = declarative_base()
