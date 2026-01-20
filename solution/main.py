@@ -16,7 +16,7 @@ def startup_event():
     # Проверить, существует ли администратор, и создать его если нет
     from sqlalchemy.orm import sessionmaker
     from sqlalchemy import create_engine
-    from solution.database.connection import sessionlocal
+    from database.connection import sessionlocal
     
     db = sessionlocal()
     try:

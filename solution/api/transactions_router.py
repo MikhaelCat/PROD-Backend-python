@@ -5,13 +5,13 @@ from pydantic import Field, BaseModel
 from datetime import datetime
 import json
 
-from solution.database.connection import get_db
-from solution.auth.dependencies import get_current_user, get_current_admin_user
-from solution.models.transaction import Transaction
-from solution.models.rule_result import RuleResult
-from solution.models.fraud_rule import FraudRule
-from solution.models.user import User
-from solution.dsl.evaluator import evaluate_dsl_expression
+from database.connection import get_db
+from auth.dependencies import get_current_user, get_current_admin_user
+from models.transaction import Transaction
+from models.rule_result import RuleResult
+from models.fraud_rule import FraudRule
+from models.user import User
+from dsl.evaluator import evaluate_dsl_expression
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
