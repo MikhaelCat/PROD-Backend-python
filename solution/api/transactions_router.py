@@ -88,10 +88,8 @@ def create_transaction(
     db: Session = Depends(get_db)
 ):
     """создание новой транзакции с проверкой на мошенничество"""
-    # если пользователь не администратор, использовать текущий идентификатор пользователя
-    if current_user.role != "admin" or request.user_id is None:
-        actual_user_id = current_user.id
-    else:
+    # если пользователь администратор и указан user_id, проверить, что можно создать транзакцию от имени другого пользователя
+    if current_user.role == "admin" and request.user_id is not None:
         actual_user_id = request.user_id
         # проверить, что пользователь существует
         target_user = db.query(User).filter(User.id == actual_user_id).first()
@@ -99,10 +97,21 @@ def create_transaction(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         if not target_user.is_active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is deactivated")
+    else:
+        # если пользователь не администратор или не указан user_id, использовать текущий идентификатор пользователя
+        actual_user_id = current_user.id
     
     # разобрать метку времени
     try:
-        timestamp = datetime.fromisoformat(request.timestamp.replace('z', '+00:00'))
+        # заменить z на +00:00 для корректной обработки ISO формата
+        timestamp_str = request.timestamp.replace('z', '+00:00').replace('Z', '+00:00')
+        # обработать различные форматы временных меток
+        if '.' in timestamp_str:
+            # если есть миллисекунды
+            timestamp = datetime.fromisoformat(timestamp_str)
+        else:
+            # если нет миллисекунд, добавить их для согласованности
+            timestamp = datetime.fromisoformat(timestamp_str)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid timestamp format")
     
@@ -126,6 +135,9 @@ def create_transaction(
     db.add(transaction)
     db.flush()  # идентификатор без фиксации
     
+    # получить пользователя для контекста проверки правил
+    user = db.query(User).filter(User.id == transaction.user_id).first()
+    
     # применить правила мошенничества
     active_rules = db.query(FraudRule).filter(FraudRule.enabled == True).order_by(FraudRule.priority, FraudRule.id).all()
     
@@ -133,21 +145,40 @@ def create_transaction(
     is_any_rule_matched = False
     
     for rule in active_rules:
-        # для сейчас, просто создать фиктивный результат 
+        # подготовить контекст для вычисления правила
+        context = {
+            'transaction': {
+                'amount': float(transaction.amount),
+                'currency': transaction.currency,
+                'merchant_id': transaction.merchant_id,
+                'merchant_category_code': transaction.merchant_category_code,
+                'channel': transaction.channel
+            },
+            'user': {
+                'age': user.age,
+                'region': user.region,
+                'gender': user.gender,
+                'marital_status': user.marital_status
+            }
+        }
+        
+        # вычислить выражение правила
+        matched, description = evaluate_dsl_expression(rule.dsl_expression, context)
+        
         rule_result = RuleResult(
             transaction_id=transaction.id,
             rule_id=rule.id,
             rule_name=rule.name,
             priority=rule.priority,
             enabled=rule.enabled,
-            matched=False,  
-            description=f"rule '{rule.name}' not evaluated due to tier 0 implementation"
+            matched=matched,
+            description=description
         )
         
         db.add(rule_result)
         rule_results.append(rule_result)
         
-        if rule_result.matched:
+        if matched:
             is_any_rule_matched = True
     
     # определить статус на основе правил
@@ -192,12 +223,12 @@ def create_transaction(
 
 @router.get("/{id}", response_model=TransactionDecision)
 def get_transaction(
-    transaction_id: str,
+    id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """получение транзакции по id"""
-    transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    transaction = db.query(Transaction).filter(Transaction.id == id).first()
     
     if not transaction:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
@@ -349,8 +380,8 @@ def create_transaction_batch(
             )
             
             # проверить права доступа для текущего пользователя
-            actual_user_id = current_user.id
-            if current_user.role == "admin" and item_request.user_id:
+            # если пользователь администратор и указан user_id, проверить, что можно создать транзакцию от имени другого пользователя
+            if current_user.role == "admin" and item_request.user_id is not None:
                 actual_user_id = item_request.user_id
                 # проверить, что пользователь существует
                 target_user = db.query(User).filter(User.id == actual_user_id).first()
@@ -358,8 +389,8 @@ def create_transaction_batch(
                     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
                 if not target_user.is_active:
                     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is deactivated")
-            elif current_user.role != "admin" and item_request.user_id:
-                # USER не может создавать транзакции для других пользователей
+            else:
+                # если пользователь не администратор или не указан user_id, использовать текущий идентификатор пользователя
                 actual_user_id = current_user.id
             
             # разобрать метку времени
@@ -388,6 +419,9 @@ def create_transaction_batch(
             db.add(transaction)
             db.flush()  # get id without committing
             
+            # получить пользователя для контекста проверки правил
+            user = db.query(User).filter(User.id == transaction.user_id).first()
+            
             # применить правила мошенничества
             active_rules = db.query(FraudRule).filter(FraudRule.enabled == True).order_by(FraudRule.priority, FraudRule.id).all()
             
@@ -395,21 +429,40 @@ def create_transaction_batch(
             is_any_rule_matched = False
             
             for rule in active_rules:
-                # для сейчас, просто создать фиктивный результат - позже реализуем реальный dsl
+                # подготовить контекст для вычисления правила
+                context = {
+                    'transaction': {
+                        'amount': float(transaction.amount),
+                        'currency': transaction.currency,
+                        'merchant_id': transaction.merchant_id,
+                        'merchant_category_code': transaction.merchant_category_code,
+                        'channel': transaction.channel
+                    },
+                    'user': {
+                        'age': user.age,
+                        'region': user.region,
+                        'gender': user.gender,
+                        'marital_status': user.marital_status
+                    }
+                }
+                
+                # вычислить выражение правила
+                matched, description = evaluate_dsl_expression(rule.dsl_expression, context)
+                
                 rule_result = RuleResult(
                     transaction_id=transaction.id,
                     rule_id=rule.id,
                     rule_name=rule.name,
                     priority=rule.priority,
                     enabled=rule.enabled,
-                    matched=False,  # placeholder for now
-                    description=f"rule '{rule.name}' not evaluated due to tier 0 implementation"
+                    matched=matched,
+                    description=description
                 )
                 
                 db.add(rule_result)
                 rule_results.append(rule_result)
                 
-                if rule_result.matched:
+                if matched:
                     is_any_rule_matched = True
             
             # определить статус на основе правил
