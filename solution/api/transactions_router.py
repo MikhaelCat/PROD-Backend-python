@@ -155,10 +155,10 @@ def create_transaction(
                 'channel': transaction.channel
             },
             'user': {
-                'age': user.age,
-                'region': user.region,
-                'gender': user.gender,
-                'marital_status': user.marital_status
+                'age': user.age if user.age is not None else 0,
+                'region': user.region if user.region is not None else '',
+                'gender': user.gender if user.gender is not None else '',
+                'marital_status': user.marital_status if user.marital_status is not None else ''
             }
         }
         
@@ -439,10 +439,10 @@ def create_transaction_batch(
                         'channel': transaction.channel
                     },
                     'user': {
-                        'age': user.age,
-                        'region': user.region,
-                        'gender': user.gender,
-                        'marital_status': user.marital_status
+                        'age': user.age if user.age is not None else 0,
+                        'region': user.region if user.region is not None else '',
+                        'gender': user.gender if user.gender is not None else '',
+                        'marital_status': user.marital_status if user.marital_status is not None else ''
                     }
                 }
                 
