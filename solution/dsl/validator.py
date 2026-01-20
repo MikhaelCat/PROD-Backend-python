@@ -39,7 +39,7 @@ def apply_fraud_rules(transaction_data: dict) -> dict:
 def validate_dsl_expression(dsl_expression: str) -> DslValidateResponse:
     """
     проверяет выражения dsl в соответствии с реализацией уровня 1 
-    поддерживает: amount, операторы > >= < <= = !=, числа
+    поддерживает: amount, операторы > >= < <= = !=, числа, поля транзакции и пользователя
     """
     import re
     
@@ -51,13 +51,22 @@ def validate_dsl_expression(dsl_expression: str) -> DslValidateResponse:
     
     # дополнительная нормализация
     expr = ' '.join(expr.split())
-    allowed_fields = ['amount']
+    # Расширяем список разрешенных полей для соответствия функциональности оценщика
+    allowed_fields = [
+        'amount', 'user.age', 'user.region', 'user.gender', 'user.marital_status',
+        'transaction.amount', 'transaction.currency', 'transaction.merchant_id',
+        'transaction.merchant_category_code', 'transaction.channel'
+    ]
     allowed_operators = ['>', '>=', '<', '<=', '=', '!=']
     tokens = expr.split()
     
     if len(tokens) == 3:
         field, operator, value = tokens
-        if field not in allowed_fields:
+        
+        # Проверяем, начинается ли поле с одного из разрешенных префиксов
+        field_allowed = any(field.startswith(allowed_field) for allowed_field in allowed_fields) or field in allowed_fields
+        
+        if not field_allowed:
             error = DslValidationError(
                 code="DSL_INVALID_FIELD",
                 message=f"Field '{field}' is not supported in current tier",
@@ -83,12 +92,20 @@ def validate_dsl_expression(dsl_expression: str) -> DslValidateResponse:
                 errors=[error]
             )
         
+        # Проверяем, является ли значение числом или строкой (в кавычках)
+        is_number = True
         try:
             float(value)
         except ValueError:
+            is_number = False
+            
+        # Проверяем, является ли значение строкой в кавычках
+        is_string = value.startswith("'") and value.endswith("'") and len(value) >= 2
+        
+        if not is_number and not is_string:
             error = DslValidationError(
                 code="DSL_PARSE_ERROR",
-                message=f"Expected number after '{operator}', got '{value}'",
+                message=f"Expected number or quoted string after '{operator}', got '{value}'",
                 position=len(field) + len(operator) + 2,
                 near=value
             )
