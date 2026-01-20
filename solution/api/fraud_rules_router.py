@@ -101,12 +101,12 @@ def create_fraud_rule(
 
 @router.get("/{id}", response_model=FraudRuleResponse)
 def get_fraud_rule(
-    rule_id: str,
+    id: str,
     current_user = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """получение правила обнаружения мошенничества по id"""
-    rule = db.query(FraudRule).filter(FraudRule.id == rule_id).first()
+    rule = db.query(FraudRule).filter(FraudRule.id == id).first()
     
     if not rule:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rule not found")
@@ -115,13 +115,13 @@ def get_fraud_rule(
 
 @router.put("/{id}", response_model=FraudRuleResponse)
 def update_fraud_rule(
-    rule_id: str,
+    id: str,
     request: FraudRuleUpdateRequest = Body(...),
     current_user = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """обновление правила обнаружения мошенничества"""
-    rule = db.query(FraudRule).filter(FraudRule.id == rule_id).first()
+    rule = db.query(FraudRule).filter(FraudRule.id == id).first()
     
     if not rule:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rule not found")
@@ -129,7 +129,7 @@ def update_fraud_rule(
     # проверить, существует ли другое правило с тем же именем (кроме этого правила)
     existing_rule = db.query(FraudRule).filter(
         FraudRule.name == request.name,
-        FraudRule.id != rule_id
+        FraudRule.id != id
     ).first()
     if existing_rule:
         raise HTTPException(
@@ -159,12 +159,12 @@ def update_fraud_rule(
 
 @router.delete("/{id}")
 def deactivate_fraud_rule(
-    rule_id: str,
+    id: str,
     current_user = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """деактивация правила обнаружения мошенничества"""
-    rule = db.query(FraudRule).filter(FraudRule.id == rule_id).first()
+    rule = db.query(FraudRule).filter(FraudRule.id == id).first()
     
     if not rule:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rule not found")

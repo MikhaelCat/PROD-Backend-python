@@ -53,7 +53,7 @@ def get_current_user_profile(current_user: User = Depends(get_current_user)):
     """получение профиля текущего пользователя"""
     return current_user
 
-@router.put("/me", response_model=UserResponse)
+@router.patch("/me", response_model=UserResponse)
 def update_current_user_profile(
     request: UserUpdateRequest = Body(...),
     current_user: User = Depends(get_current_user),
@@ -74,37 +74,37 @@ def update_current_user_profile(
 
 @router.get("/{id}", response_model=UserResponse)
 def get_user_by_id(
-    user_id: str,
+    id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """получение пользователя по id"""
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == id).first()
     
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
     # проверить разрешения
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role != "admin" and current_user.id != id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     return user
 
 @router.put("/{id}", response_model=UserResponse)
 def update_user_by_id(
-    user_id: str,
+    id: str,
     request: UserUpdateRequest = Body(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """обновление пользователя по id"""
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == id).first()
     
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
     # проверить разрешения
-    if current_user.role != "admin" and current_user.id != user_id:
+    if current_user.role != "admin" and current_user.id != id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     #проверить, не пытается ли пользователь изменить роль или is_active (не разрешено для обычных пользователей)
@@ -133,12 +133,12 @@ def update_user_by_id(
 
 @router.delete("/{id}")
 def deactivate_user(
-    user_id: str,
+    id: str,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """деактивация пользователя администратором"""
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == id).first()
     
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
