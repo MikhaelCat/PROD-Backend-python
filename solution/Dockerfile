@@ -19,13 +19,7 @@ COPY solution/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-COPY ./requirements.txt requirements.txt
-COPY ./api ./api
-COPY ./auth ./auth
-COPY ./database ./database
-COPY ./dsl ./dsl
-COPY ./models ./models
-COPY ./main.py main.py
+COPY solution/ .
 
 
 RUN adduser --disabled-password --gecos '' appuser
