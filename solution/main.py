@@ -38,9 +38,11 @@ def startup_event():
         admin_user = db.query(User).filter(User.email == settings.admin_email).first()
         if not admin_user:
             print(f"Creating admin user with email: {settings.admin_email}")
+            # Truncate password to 72 characters to comply with bcrypt limitations
+            admin_password = settings.admin_password[:72] if len(settings.admin_password) > 72 else settings.admin_password
             admin_user = User(
                 email=settings.admin_email,
-                password_hash=get_password_hash(settings.admin_password),
+                password_hash=get_password_hash(admin_password),
                 full_name=settings.admin_fullname,
                 role="admin",
                 is_active=True
@@ -53,6 +55,9 @@ def startup_event():
             print(f"Admin user already exists with ID: {admin_user.id}")
     except Exception as e:
         print(f"Error creating admin user: {e}")
+        # Log more specific information about the error
+        import traceback
+        traceback.print_exc()
         db.rollback()
     finally:
         db.close()

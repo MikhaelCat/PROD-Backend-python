@@ -13,4 +13,5 @@ uuid==1.30
 typing-extensions==4.8.0
 httpx==0.26.0
 psycopg2-binary==2.9.9
+bcrypt==4.0.1
 
