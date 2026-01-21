@@ -12,7 +12,7 @@ def test_get_current_user(client, mock_auth_dependencies):
         "email": "test@example.com", 
         "full_name": "test user",
         "role": "user",
-        "is_active": true
+        "is_active": True
     }
     mock_auth_dependencies.return_value = mock_user
     
@@ -36,7 +36,7 @@ def test_update_user_profile(client, mock_auth_dependencies):
         "email": "test@example.com",
         "full_name": "test user",
         "role": "user",
-        "is_active": true
+        "is_active": True
     }
     mock_auth_dependencies.return_value = mock_user
     
@@ -66,7 +66,7 @@ def test_get_users_list(client, mock_auth_dependencies):
         "email": "admin@example.com",
         "full_name": "admin user",
         "role": "admin",
-        "is_active": true
+        "is_active": True
     }
     mock_auth_dependencies.return_value = mock_admin
     
@@ -88,7 +88,7 @@ def test_get_users_list_non_admin(client, mock_auth_dependencies):
         "email": "test@example.com",
         "full_name": "test user",
         "role": "user",  # обычный пользователь, не админ
-        "is_active": true
+        "is_active": True
     }
     mock_auth_dependencies.return_value = mock_user
     
