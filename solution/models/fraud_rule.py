@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from database.connection import Base
 from datetime import datetime
 import uuid
-
-Base = declarative_base()
 
 class FraudRule(Base):
     __tablename__ = "fraud_rules"
