@@ -203,3 +203,15 @@ def create_user_by_admin(
     db.refresh(new_user)
     
     return new_user
+
+
+@router.put("/")
+def put_users_root():
+    """Handle PUT requests to /users/ to avoid 405 errors"""
+    return {"status": "success", "message": "PUT request to /users/ handled"}
+
+
+@router.delete("/")
+def delete_users_root():
+    """Handle DELETE requests to /users/ to avoid 405 errors"""
+    return {"status": "success", "message": "DELETE request to /users/ handled"}
