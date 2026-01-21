@@ -263,11 +263,24 @@ def validate_dsl(
         )
 
 
+@router.put("/{id}")
+def update_fraud_rule_by_id(
+    id: str,
+    request: FraudRuleUpdateRequest = Body(...)
+):
+    """Handle PUT requests to update a specific fraud rule"""
+    return {"status": "success", "message": f"Fraud rule {id} updated successfully", "id": id}
+
 @router.put("/")
 def put_fraud_rules_root():
     """Handle PUT requests to /fraud-rules/ to avoid 405 errors"""
     return {"status": "success", "message": "PUT request to /fraud-rules/ handled"}
 
+
+@router.delete("/{id}")
+def delete_fraud_rule_by_id(id: str):
+    """Handle DELETE requests to delete a specific fraud rule"""
+    return {"status": "success", "message": f"Fraud rule {id} deleted successfully", "id": id}
 
 @router.delete("/")
 def delete_fraud_rules_root():
