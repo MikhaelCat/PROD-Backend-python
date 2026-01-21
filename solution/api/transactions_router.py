@@ -206,7 +206,7 @@ def create_transaction(
             channel=transaction.channel,
             location=json.loads(transaction.location) if transaction.location else None,
             is_fraud=transaction.is_fraud,
-            metadata=json.loads(transaction.metadata) if transaction.metadata else None,
+            metadata=json.loads(transaction.transaction_metadata) if transaction.transaction_metadata else None,
             created_at=transaction.created_at.isoformat()
         ),
         rule_results=[
