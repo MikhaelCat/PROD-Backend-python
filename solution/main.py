@@ -13,7 +13,13 @@ from auth.utils import get_password_hash
 from database.settings import settings
 import uvicorn
 
-app = FastAPI(title="Anti-fraud Service API", version="1.3.0")
+app = FastAPI(
+    title="Anti-fraud Service API", 
+    version="1.3.0",
+    redoc_url="/api/v1/redoc",
+    docs_url="/api/v1/docs",
+    redirect_slashes=False
+)
 
 # Создание таблиц при запуске
 @app.on_event("startup")
@@ -21,31 +27,35 @@ def startup_event():
     # Create all tables first
     Base.metadata.create_all(bind=engine)
     
-    # Then check if we need to create the admin user (skip during testing)
-    if not TESTING:
-        from sqlalchemy.orm import sessionmaker
-        from sqlalchemy import create_engine
-        from database.connection import sessionlocal
-        
-        db = sessionlocal()
-        try:
-            # Ensure tables exist before querying
-            admin_user = db.query(User).filter(User.email == settings.admin_email).first()
-            if not admin_user:
-                admin_user = User(
-                    email=settings.admin_email,
-                    password_hash=get_password_hash(settings.admin_password),
-                    full_name=settings.admin_fullname,
-                    role="admin",
-                    is_active=True
-                )
-                db.add(admin_user)
-                db.commit()
-        except Exception as e:
-            print(f"Error creating admin user: {e}")
-            db.rollback()
-        finally:
-            db.close()
+    # Always check if we need to create the admin user (including during testing)
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy import create_engine
+    from database.connection import sessionlocal
+    
+    db = sessionlocal()
+    try:
+        # Ensure tables exist before querying
+        admin_user = db.query(User).filter(User.email == settings.admin_email).first()
+        if not admin_user:
+            print(f"Creating admin user with email: {settings.admin_email}")
+            admin_user = User(
+                email=settings.admin_email,
+                password_hash=get_password_hash(settings.admin_password),
+                full_name=settings.admin_fullname,
+                role="admin",
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            db.refresh(admin_user)  # Refresh to get the ID
+            print(f"Admin user created successfully with ID: {admin_user.id}")
+        else:
+            print(f"Admin user already exists with ID: {admin_user.id}")
+    except Exception as e:
+        print(f"Error creating admin user: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
 # подключение маршрутов
 app.include_router(auth_router, prefix="/api/v1")
