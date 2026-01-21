@@ -1,7 +1,18 @@
 ```
-# Database files
-*.db
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
-# Test files
-tests/**
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Original rules preserved
+*.log
 ```
