@@ -23,49 +23,7 @@ app = FastAPI(
     docs_url="/api/v1/docs"
 )
 
-from fastapi import Request   
-from fastapi.responses import JSONResponse
 
-# Add middleware to handle redirects and ensure 200 status codes
-@app.middleware("http")
-async def force_200_middleware(request: Request, call_next):
-    """Middleware to ensure all requests return 200 OK"""
-    try:
-        response = await call_next(request)
-        
-        # If the response is a redirect (307) or error (4xx, 5xx), change it to 200
-        if response.status_code in [307]:  # Temporary redirect
-            # For redirects, we'll return a 200 with info about the redirect
-            return JSONResponse(
-                status_code=200,
-                content={
-                    "status": "success",
-                    "message": f"Redirect intercepted - endpoint accessed successfully",
-                    "redirect_handled": True
-                }
-            )
-        elif response.status_code >= 400:
-            # For error responses, return 200 with success info
-            return JSONResponse(
-                status_code=200,
-                content={
-                    "status": "success",
-                    "message": f"Request processed successfully (original status: {response.status_code})",
-                    "original_status_code": response.status_code
-                },
-                headers=dict(response.headers)
-            )
-        
-        return response
-    except Exception as e:
-        # Handle any uncaught exceptions and return 200
-        return JSONResponse(
-            status_code=200,
-            content={
-                "status": "success",
-                "message": f"Request processed successfully despite error: {str(e)}"
-            }
-        )
 
 # Создание таблиц при запуске
 @app.on_event("startup")
