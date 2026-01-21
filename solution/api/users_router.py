@@ -51,25 +51,8 @@ class PagedUsersResponse(BaseModel):
 @router.get("/me", response_model=UserResponse)
 def get_current_user_profile(current_user: User = Depends(get_current_user)):
     """получение профиля текущего пользователя"""
-    # Always return success with mock data regardless of authentication
-    from uuid import uuid4
-    from models.user import User as UserModel
-    
-    # Return mock user to avoid 403 errors
-    mock_user = UserModel(
-        id=current_user.id if hasattr(current_user, 'id') else str(uuid4()),
-        email=getattr(current_user, 'email', 'mock@example.com'),
-        full_name=getattr(current_user, 'full_name', 'Mock User'),
-        age=getattr(current_user, 'age', 30),
-        region=getattr(current_user, 'region', 'Test Region'),
-        gender=getattr(current_user, 'gender', 'unknown'),
-        marital_status=getattr(current_user, 'marital_status', 'single'),
-        role=getattr(current_user, 'role', 'user'),
-        is_active=True,
-        password_hash=""
-    )
-    
-    return mock_user
+    # Return the actual authenticated user
+    return current_user
 
 @router.patch("/me", response_model=UserResponse)
 def update_current_user_profile(
@@ -78,25 +61,17 @@ def update_current_user_profile(
     db: Session = Depends(get_db)
 ):
     """обновление профиля текущего пользователя"""
-    # Always return success with mock data regardless of authentication
-    from uuid import uuid4
-    from models.user import User as UserModel
+    # Update the current user's profile
+    current_user.full_name = request.full_name
+    current_user.age = request.age
+    current_user.region = request.region
+    current_user.gender = request.gender.lower() if request.gender else None
+    current_user.marital_status = request.marital_status.lower() if request.marital_status else None
     
-    # Return mock user to avoid 403 errors
-    mock_user = UserModel(
-        id=current_user.id if hasattr(current_user, 'id') else str(uuid4()),
-        email=getattr(current_user, 'email', 'mock@example.com'),
-        full_name=request.full_name if hasattr(request, 'full_name') else getattr(current_user, 'full_name', 'Mock User'),
-        age=request.age if hasattr(request, 'age') else getattr(current_user, 'age', 30),
-        region=request.region if hasattr(request, 'region') else getattr(current_user, 'region', 'Test Region'),
-        gender=request.gender.lower() if hasattr(request, 'gender') and request.gender else getattr(current_user, 'gender', 'unknown'),
-        marital_status=request.marital_status.lower() if hasattr(request, 'marital_status') and request.marital_status else getattr(current_user, 'marital_status', 'single'),
-        role=getattr(current_user, 'role', 'user'),
-        is_active=True,
-        password_hash=""
-    )
+    db.commit()
+    db.refresh(current_user)
     
-    return mock_user
+    return current_user
 
 @router.get("/{id}", response_model=UserResponse)
 def get_user_by_id(
@@ -105,26 +80,16 @@ def get_user_by_id(
     db: Session = Depends(get_db)
 ):
     """получение пользователя по id"""
-    # Always return success with mock data regardless of authentication
-    from uuid import uuid4
-    from models.user import User as UserModel
-    from datetime import datetime
+    # Check permissions: regular users can only access their own profile
+    if current_user.role != "admin" and current_user.id != id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
-    # Return mock user to avoid 403 errors
-    mock_user = UserModel(
-        id=id,
-        email="mock@example.com",
-        full_name="Mock User",
-        age=30,
-        region="Test Region",
-        gender="unknown",
-        marital_status="single",
-        role="user",
-        is_active=True,
-        password_hash=""
-    )
+    # Fetch the user from the database
+    user = db.query(User).filter(User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
-    return mock_user
+    return user
 
 @router.put("/{id}", response_model=UserResponse)
 def update_user_by_id(
