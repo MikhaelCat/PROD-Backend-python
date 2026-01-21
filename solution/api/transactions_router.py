@@ -530,4 +530,4 @@ def create_transaction_batch(
     
     status_code = status.HTTP_207_MULTI_STATUS if has_errors else status.HTTP_201_CREATED
     
-    return TransactionBatchResult(items=results)    return TransactionBatchResult(items=results)
+    return TransactionBatchResult(items=results)   
