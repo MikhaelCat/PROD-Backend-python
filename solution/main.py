@@ -1,3 +1,7 @@
+import os
+# Check if we're in test mode early, before importing database modules
+TESTING = os.getenv("TESTING", "False").lower() == "true"
+
 from fastapi import FastAPI
 from api import auth_router, users_router, transactions_router, fraud_rules_router
 from database.connection import engine, Base
@@ -8,12 +12,8 @@ from models.rule_result import RuleResult
 from auth.utils import get_password_hash
 from database.settings import settings
 import uvicorn
-import os
 
 app = FastAPI(title="Anti-fraud Service API", version="1.3.0")
-
-# Check if we're in test mode
-TESTING = os.getenv("TESTING", "False").lower() == "true"
 
 # Создание таблиц при запуске
 @app.on_event("startup")

@@ -1,3 +1,7 @@
+import os
+# Set testing environment variable before importing the app
+os.environ["TESTING"] = "True"
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
