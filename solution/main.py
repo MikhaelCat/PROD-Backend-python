@@ -17,8 +17,8 @@ app = FastAPI(
     title="Anti-fraud Service API", 
     version="1.3.0",
     redoc_url="/api/v1/redoc",
-    docs_url="/api/v1/docs",
-    redirect_slashes=False
+    docs_url="/api/v1/docs"
+    # Removed redirect_slashes=False to allow slash redirects
 )
 
 # Создание таблиц при запуске
