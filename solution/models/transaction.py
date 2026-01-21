@@ -1,11 +1,9 @@
 from sqlalchemy import Column, Integer, String, Numeric, DateTime, Boolean, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from database.connection import Base
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from typing import Optional, Dict, Any
 import uuid
-
-Base = declarative_base()
 
 class Transaction(Base):
     __tablename__ = "transactions"

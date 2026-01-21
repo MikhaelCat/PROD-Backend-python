@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from database.connection import Base
 from datetime import datetime
 import uuid
-
-Base = declarative_base()
 
 class RuleResult(Base):
     __tablename__ = "rule_results"

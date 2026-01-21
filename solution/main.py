@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from api import auth_router, users_router, transactions_router, fraud_rules_router
 from database.connection import engine, Base
 from models.user import User
+from models.transaction import Transaction
+from models.fraud_rule import FraudRule
+from models.rule_result import RuleResult
 from auth.utils import get_password_hash
 from database.settings import settings
 import uvicorn
@@ -15,11 +18,10 @@ TESTING = os.getenv("TESTING", "False").lower() == "true"
 # Создание таблиц при запуске
 @app.on_event("startup")
 def startup_event():
-    # Only create tables if not in testing mode, or create them when needed in tests
+    # Create all tables first
     Base.metadata.create_all(bind=engine)
     
-    # Проверить, существует ли администратор, и создать его если нет
-    # Skip admin creation during testing to avoid issues with database setup timing
+    # Then check if we need to create the admin user (skip during testing)
     if not TESTING:
         from sqlalchemy.orm import sessionmaker
         from sqlalchemy import create_engine
@@ -27,6 +29,7 @@ def startup_event():
         
         db = sessionlocal()
         try:
+            # Ensure tables exist before querying
             admin_user = db.query(User).filter(User.email == settings.admin_email).first()
             if not admin_user:
                 admin_user = User(
@@ -38,6 +41,9 @@ def startup_event():
                 )
                 db.add(admin_user)
                 db.commit()
+        except Exception as e:
+            print(f"Error creating admin user: {e}")
+            db.rollback()
         finally:
             db.close()
 
