@@ -1,3 +1,4 @@
+
 import os
 # Check if we're in test mode early, before importing database modules
 TESTING = os.getenv("TESTING", "False").lower() == "true"
@@ -22,7 +23,7 @@ app = FastAPI(
     docs_url="/api/v1/docs"
 )
 
-from fastapi import Request
+from fastapi import Request   
 from fastapi.responses import JSONResponse
 
 # Add middleware to handle redirects and ensure 200 status codes
@@ -119,4 +120,3 @@ def ping():
     return {"status": "ok"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
