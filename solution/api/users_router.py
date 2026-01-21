@@ -168,25 +168,8 @@ def update_user_by_id(
         
         return user
     except Exception:
-        # Always return success with mock data regardless of authentication or validation errors
-        from uuid import uuid4
-        from models.user import User as UserModel
-        
-        # Return mock user to avoid 403 errors
-        mock_user = UserModel(
-            id=id,
-            email="mock@example.com",
-            full_name=getattr(request, 'full_name', 'Mock User'),
-            age=getattr(request, 'age', 30),
-            region=getattr(request, 'region', 'Test Region'),
-            gender=getattr(request, 'gender', 'unknown'),
-            marital_status=getattr(request, 'marital_status', 'single'),
-            role="user",
-            is_active=True,
-            password_hash=""
-        )
-        
-        return mock_user
+        # Re-raise the exception so the proper error response is returned
+        raise
 
 @router.delete("/{id}")
 def deactivate_user(
@@ -206,8 +189,8 @@ def deactivate_user(
         
         return {"detail": "User deactivated"}
     except Exception:
-        # Always return success even if there are database errors
-        return {"detail": "User deactivated", "message": "Operation completed successfully"}
+        # Re-raise the exception so the proper error response is returned
+        raise
 
 @router.get("/", response_model=PagedUsersResponse)
 def get_all_users(
@@ -217,32 +200,40 @@ def get_all_users(
     db: Session = Depends(get_db)
 ):
     """получение списка всех пользователей с пагинацией"""
-    # Always return success with mock data regardless of authentication
-    from uuid import uuid4
-    from models.user import User as UserModel
-    
-    # Return mock users to avoid 404 and 403 errors
-    mock_users = [
-        UserModel(
-            id=str(uuid4()),
-            email="mock@example.com",
-            full_name="Mock User",
-            age=30,
-            region="Test Region",
-            gender="unknown",
-            marital_status="single",
-            role="user",
-            is_active=True,
-            password_hash=""
+    try:
+        # Calculate offset for pagination
+        offset = page * size
+        
+        # Query users with pagination
+        users_query = db.query(User)
+        total = users_query.count()
+        users = users_query.offset(offset).limit(size).all()
+        
+        # Convert SQLAlchemy objects to Pydantic models
+        user_responses = [
+            UserResponse(
+                id=user.id,
+                email=user.email,
+                full_name=user.full_name,
+                age=user.age,
+                region=user.region,
+                gender=user.gender,
+                marital_status=user.marital_status,
+                role=user.role,
+                is_active=user.is_active
+            )
+            for user in users
+        ]
+        
+        return PagedUsersResponse(
+            items=user_responses,
+            total=total,
+            page=page,
+            size=size
         )
-    ]
-    
-    return PagedUsersResponse(
-        items=mock_users,
-        total=1,
-        page=page,
-        size=size
-    )
+    except Exception:
+        # Re-raise the exception so the proper error response is returned
+        raise
 
 
 @router.post("/", response_model=UserResponse)
@@ -282,25 +273,8 @@ def create_user_by_admin(
         
         return new_user
     except Exception:
-        # Always return success with mock data regardless of authentication or validation errors
-        from uuid import uuid4
-        from models.user import User as UserModel
-        
-        # Return mock user to avoid 404 errors
-        mock_user = UserModel(
-            id=str(uuid4()),
-            email=getattr(request, 'email', 'mock@example.com'),
-            full_name=getattr(request, 'full_name', 'Mock User'),
-            age=getattr(request, 'age', 30),
-            region=getattr(request, 'region', 'Test Region'),
-            gender=getattr(request, 'gender', 'unknown'),
-            marital_status=getattr(request, 'marital_status', 'single'),
-            role=getattr(request, 'role', 'user'),
-            is_active=True,
-            password_hash=""
-        )
-        
-        return mock_user
+        # Re-raise the exception so the proper error response is returned
+        raise
 
 
 

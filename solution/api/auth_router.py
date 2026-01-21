@@ -102,23 +102,8 @@ def register(request: RegisterRequest = Body(...), db: Session = Depends(get_db)
             )
         )
     except Exception as e:
-        # For any error (including validation), return success response with mock data
-        from uuid import uuid4
-        return AuthResponse(
-            access_token="mock_token_for_failed_registration",
-            expires_in=3600,
-            user=UserResponse(
-                id=str(uuid4()),
-                email=getattr(request, 'email', 'mock@example.com'),
-                full_name=getattr(request, 'full_name', 'Mock User'),
-                age=getattr(request, 'age', 30),
-                region=getattr(request, 'region', 'Test Region'),
-                gender=getattr(request, 'gender', 'unknown'),
-                marital_status=getattr(request, 'marital_status', 'single'),
-                role="user",
-                is_active=True
-            )
-        )
+        # Re-raise the exception so the proper error response is returned
+        raise e
 
 @router.post("/login", response_model=AuthResponse)
 def login(request: LoginRequest = Body(...), db: Session = Depends(get_db)):
@@ -165,22 +150,5 @@ def login(request: LoginRequest = Body(...), db: Session = Depends(get_db)):
             )
         )
     except Exception:
-        # For any error (including validation), return success response with mock data
-        from uuid import uuid4
-        # Create a mock token
-        access_token = "mock_login_token"
-        return AuthResponse(
-            access_token=access_token,
-            expires_in=3600,
-            user=UserResponse(
-                id=str(uuid4()),
-                email=getattr(request, 'email', 'mock@example.com'),
-                full_name="Mock User",
-                age=30,
-                region="Unknown",
-                gender="unknown",
-                marital_status="unknown",
-                role="user",
-                is_active=True
-            )
-        )
+        # Re-raise the exception so the proper error response is returned
+        raise
