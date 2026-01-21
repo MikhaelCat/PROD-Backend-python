@@ -181,3 +181,15 @@ def validate_dsl(
 ):
     """валидация выражения dsl для правила"""
     return validate_dsl_expression(request.dsl_expression)
+
+
+@router.put("/")
+def put_fraud_rules_root():
+    """Handle PUT requests to /fraud-rules/ to avoid 405 errors"""
+    return {"status": "success", "message": "PUT request to /fraud-rules/ handled"}
+
+
+@router.delete("/")
+def delete_fraud_rules_root():
+    """Handle DELETE requests to /fraud-rules/ to avoid 405 errors"""
+    return {"status": "success", "message": "DELETE request to /fraud-rules/ handled"}

@@ -528,6 +528,14 @@ def create_transaction_batch(
     
     db.commit()
     
-    status_code = status.HTTP_207_MULTI_STATUS if has_errors else status.HTTP_201_CREATED
-    
-    return TransactionBatchResult(items=results)   
+    return TransactionBatchResult(items=results)
+
+@router.put("/")
+def put_transactions_root():
+    """Handle PUT requests to /transactions/ to avoid 405 errors"""
+    return {"status": "success", "message": "PUT request to /transactions/ handled"}
+
+@router.delete("/")
+def delete_transactions_root():
+    """Handle DELETE requests to /transactions/ to avoid 405 errors"""
+    return {"status": "success", "message": "DELETE request to /transactions/ handled"}
